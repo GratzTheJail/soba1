@@ -3,6 +3,13 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+// estrutura auxiliar para organização da tabela de desvios
+typedef struct desvio Desvio;
+struct desvio{
+    int i; // deslocamento em bytes desde o início do código da onde o jump será chamado
+    int linhaDestino; // linha (do arquivo sbas) para a qual será pulado
+};
+
 // mensagem de erro e termino de programa
 static void error (const char *msg, int line) {
   fprintf(stderr, "erro %s na linha %d\n", msg, line);
@@ -440,16 +447,73 @@ int operacao(unsigned char codigo[], int v1, int i1, int v2, int i2, int op, int
     return i;
 }
 
+// cria as bases para uma condicional com um desvio, que só será calculado e escrito ao final do programa 
+// atual = i atual
+// desvioLine é uma tabela com o lugar dos desvios no codigo e a linha (sbas) para qual será desviado 
+// desvioN = nr do desvio atual (nr do proximo desvio sera retornado atraves dessa variavel)
+int condicional(unsigned char codigo[], int atual, char v1, int i1, int n, Desvio desvioLine[], int* desvioN){
+// CMPL: 0X83 0X7D -...(%rbp) 0x0
+    int i = 0;
+    
+    // escreve para qual linha esse desvio pulará em caso de sucesso
+    desvioLine[*desvioN].linhaDestino = n;
+    
+    // instruções de comparação de int
+    codigo[i++] = 0x83;
+    codigo[i++] = 0x7d;
+    
+    // compara a variável específica com o valor 0
+    codigo[i++] = rbp_offset(i1);
+    codigo[i++] = 0x0;
+    
+    // jbe extendido (near jump)
+    codigo[i++] = 0x0f;
+    codigo[i++] = 0x8e;
+    
+    // define o endereço que será substituído pelo offset do comando jmp
+    desvioLine[*desvioN].i = atual + i;
+
+    
+    // neste caso salvamos 0 na instrução para depois calcularmos o offset
+    i += int2LE(codigo + i, 0);
+    
+    (*desvioN)++;
+    return i;
+}
+
+// vetor codigo completo a partir da primeira posição
+void escreve_desvios(unsigned char codigo[], Desvio desvioLine[], int qtdDesvio, int lineEnd[]){
+    for(int j = 0; j < qtdDesvio; j++){
+        int i = desvioLine[j].i;
+        int endLine = lineEnd[desvioLine[j].linhaDestino - 1];
+        
+        // calcula offset do jmp como endereço da linha para a qual haverá o jump - endereço do próximo comando
+        int offset = endLine - (i + 0x04);
+        // escreve esse offset no codigo
+        int2LE(codigo + i, offset);
+    }
+}
+
 // DICA: PARA IFS USAR TABELA - OLHAR FOTO DO QUADRO
 funcp peqcomp(FILE *f, unsigned char codigo[]){
     int line = 1;
     int c;
 
+    // vetor com o endereço de cada linha
+    int lineEnd[50];
+
+    // vetor com a linha para qual será desviado o código a cada desvio
+    // 1o desvio = pos 0; 2o desvio = pos 1; ...
+    Desvio desvioLine[15];
+    int desvioN = 0;
+
+    
     // PROLOGO + CRIAÇÃO DO RA
     int i = prologo(codigo);
 
 
     while ((c = fgetc(f)) != EOF) {
+    lineEnd[line - 1] = i;
     switch (c) {
       /* retorno */
       case 'r': { 
@@ -495,6 +559,7 @@ funcp peqcomp(FILE *f, unsigned char codigo[]){
         int idx0, n;
         if (fscanf(f, "flez %c%d %d", &var0, &idx0, &n) != 3)
             error("comando invalido", line);
+          i += condicional(codigo + i, i, var0, idx0, n, desvioLine, &desvioN);
           printf("%d iflez %c%d %d\n", line, var0, idx0, n);
         break;
       }
@@ -505,6 +570,8 @@ funcp peqcomp(FILE *f, unsigned char codigo[]){
   }
 
 //   printf("tam:%d\n", i);
+// insere os offsets dos desvios caso existam
+  escreve_desvios(codigo, desvioLine, desvioN, lineEnd);
 
   return (funcp)codigo;
 }

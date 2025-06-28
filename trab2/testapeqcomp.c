@@ -45,6 +45,7 @@ int main (void) {
       fclose(f);
 
       printf("Retorno: %d\n", (*func)(2, -3, 4));
+      // dump(func, 50);
       printf("\n");
     }
   }

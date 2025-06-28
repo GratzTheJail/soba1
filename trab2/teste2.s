@@ -1,15 +1,20 @@
 .text
-.globl foo
-foo:
+.globl main
+main:
 	pushq %rbp
 	movq %rsp, %rbp	
 	subq $32, %rsp
 
-	movl -20(%rbp), %ecx
-        imull -8(%rbp), %ecx
-	movl %ecx, -4(%rbp)
+	movl $-5, -8(%rbp)
+	cmpl $0, -8(%rbp)
+	jbe teste
+	movl $0, %eax
+	
+	leave
+	ret
 
-	movl -4(%rbp), %eax
+teste:
+	movl $1, %eax
 
 	leave
 	ret
