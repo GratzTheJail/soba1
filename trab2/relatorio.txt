@@ -1,1 +1,4 @@
 Guilherme Melo Gratz  2211068  3WA
+
+(Creio eu que) Está tudo correto e funcionando, desde as atribuições e operações ao uso de variáveis e parâmetros, bem como o desvio condicional. 
+NOTA: Houve no meu caso um conflito de versões usando o GCC. No meu computador pessoal uso o GCC 15. Ele não permite chamar um ponteiro para função com quantos parâmetros quisermos, apenas um número específico (isto foi debatido com o professor). Utilizando o github codespaces o GCC é versão 13 para ubuntu. Nesta versão, o problema dos parâmetros é apenas um warning e não um erro. Portanto o programa consegue rodar. Para o trabalho durante o desenvolvimento mudei o .h para evitar este erro. Mas ao final fiz um teste com github codespaces e não tive problema.

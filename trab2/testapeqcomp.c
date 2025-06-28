@@ -1,4 +1,4 @@
-/*Guilherme Melo Gratz*/
+/*Guilherme Melo Gratz 2211068 3WA*/
 
 #include "peqcomp.h"
 #include <stdio.h>
