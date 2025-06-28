@@ -41,6 +41,7 @@ int main (void) {
     	  perror ("nao conseguiu abrir arquivo!");
     	  exit(1);
       }
+      printf("%s:\n", de->d_name);
       funcp func = peqcomp(f, codigo);
       fclose(f);
 

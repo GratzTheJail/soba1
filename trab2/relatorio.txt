@@ -2,3 +2,107 @@ Guilherme Melo Gratz  2211068  3WA
 
 (Creio eu que) Está tudo correto e funcionando, desde as atribuições e operações ao uso de variáveis e parâmetros, bem como o desvio condicional. 
 NOTA: Houve no meu caso um conflito de versões usando o GCC. No meu computador pessoal uso o GCC 15. Ele não permite chamar um ponteiro para função com quantos parâmetros quisermos, apenas um número específico (isto foi debatido com o professor). Utilizando o github codespaces o GCC é versão 13 para ubuntu. Nesta versão, o problema dos parâmetros é apenas um warning e não um erro. Portanto o programa consegue rodar. Para o trabalho durante o desenvolvimento mudei o .h para evitar este erro. Mas ao final fiz um teste com github codespaces e não tive problema.
+
+Para o teste do programa usei algumas funções sbas (aqui estão apenas as principais).
+
+* Para os testes de retorno e atribuição de variáveis:
+
+retconst.sbas:
+1 ret $-123
+Retorno: -123
+
+retvar.sbas:
+1 v1 : $5
+2 ret v1
+Retorno: 5
+
+
+
+* Para os testes de operandos:
+
+varadd.sbas:
+1 v1 = $5 + $5
+2 v2 = v1 + $5
+3 v2 = $5 + v2
+4 v1 = v1 + v2
+5 ret v1
+Retorno: 30
+
+varaddneg.sbas:
+1 v1 = $5 + $-50
+2 v2 = v1 + $5
+3 v2 = $5 + v2
+4 v1 = v1 + v2
+5 ret v1
+Retorno: -80
+
+varsub.sbas:
+1 v1 = $50 - $5
+2 v2 = v1 - $5
+3 v2 = $5 - v2
+4 v1 = v1 - v2
+5 ret v1
+Retorno: 80
+
+varsubneg.sbas:
+1 v1 = $-50 - $5
+2 v2 = v1 - $5
+3 v2 = $5 - v2
+4 v1 = v1 - v2
+5 ret v1
+Retorno: -120
+
+varmultparam.sbas:
+1 v1 : p1
+2 v2 : p2
+3 v3 : p3
+4 v1 = v1 * v2
+5 v1 = v1 * v3
+6 ret v1
+Retorno: -24
+
+varmultneg.sbas:
+1 v1 = $-5 * $5
+2 v2 = v1 * $5
+3 v2 = $5 * v2
+4 v1 = v1 * v2
+5 ret v1
+Retorno: 15625
+
+
+
+* Para testes de if:
+
+testeif.sbas:
+1 v1 : $-5
+2 v1 = v1 + $1
+3 iflez v1 5
+4 ret $0
+5 ret $1
+Retorno: 1
+
+testeif2.sbas:
+1 v1 : $10
+2 v1 = v1 + $1
+3 iflez v1 5
+4 ret $0
+5 ret $1
+Retorno: 0
+
+
+
+* Para o teste dos parâmetros (passando 2, -3, 4 como parâmetros):
+
+param.sbas:
+1 v1 : p1
+2 v2 : p2
+3 v3 : p3
+4 v4 = v1 * v2
+5 v4 = v4 * v3
+6 ret v4
+Retorno: -24
+
+
+Como se pode ver pelas funções de sbas e pelos retornos, o programa roda como esperado. 
+
+Atenção! Caso vá compilar este programa, lembre-se de usar GCC versão 13 ou se usar uma outra versão como a 15, colocar 3 parâmetros "dummy" para o ponteiro de função para não haver erro de compilação.
